@@ -608,6 +608,7 @@ int main()
         else
         {
             caida0.play();
+            estado = 1;
             victorias2 = victorias2+1;
             if(victorias1+victorias2 != 5)
             {
@@ -716,6 +717,7 @@ int main()
             //std::cout << "Esta fuera del tablero 2" << std::endl;
             //reiniciar = true, victorias +1 -1
             caida0.play();
+            estado = 1;
             victorias1 = victorias1+1;
             if(victorias1+victorias2 != 5)
             {
