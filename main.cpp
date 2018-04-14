@@ -7,31 +7,6 @@
 //Constantes
 #define PI 3.14159265
 
-bool HayColisiones(sf::Image &imagen1, sf::Image &imagen2, int xi3, int xi4, int yi3, int yi4)
-{
-  bool hay;
-  hay = false;
-  sf::Color color1;
-  sf::Color color2;
-  int a;
-  int b;
-  
-  for(int a = 0; a < 40 && hay != true;a++)
-  {
-      for(int b = 0; b < 40 && hay != true;b++)
-      {
-          color1 = imagen1.getPixel(a,b);
-          color2 = imagen2.getPixel(a,b);
-          if(color1.r == 0 && color1.b == 0 && color1.g == 0)
-          {
-              hay = true;
-          }
-      }
-  }
-  
-  return hay;
-}
-
 int main()
 {
     //Creamos una ventana 
@@ -112,19 +87,39 @@ int main()
     //Y creo el spritesheet a partir de la imagen anterior
     sf::Sprite sprite(tex),sprite2(tex);
     sf::Sprite spriteMap(map);
+    
+    sf::RectangleShape pD1(sf::Vector2f(5,20));
+    sf::RectangleShape pI1(sf::Vector2f(5,20));
+    sf::RectangleShape pU1(sf::Vector2f(5,20));
+    sf::RectangleShape pW1(sf::Vector2f(5,20));
+    
+    pD1.setOrigin(0,-2);
+    pI1.setOrigin(4,-2);
+    pI1.setFillColor(sf::Color::Green);
+    pD1.setFillColor(sf::Color::Red);
+    pI1.setPosition(190,460);
+    pD1.setPosition(190,460);
+    
+    pU1.setOrigin(0,-2);
+    pW1.setOrigin(4,-2);
+    pU1.setFillColor(sf::Color::Green);
+    pW1.setFillColor(sf::Color::Red);
+    pU1.setPosition(160,460);
+    pW1.setPosition(160,460);
+    
     //Le pongo el centroide donde corresponde
-    sprite.setOrigin(28/2,1);
-    sprite2.setOrigin(28/2,1);
+    sprite.setOrigin(18/2,1);
+    sprite2.setOrigin(18/2,1);
     spriteMap.setOrigin(0,0);
     //Cojo el sprite que me interesa por defecto del sheet
-    sprite.setTextureRect(sf::IntRect(0, 7, 28, 22));
-    sprite2.setTextureRect(sf::IntRect(0, 7, 28, 22));
+    sprite.setTextureRect(sf::IntRect(10, 6, 18, 23));
+    sprite2.setTextureRect(sf::IntRect(10, 6, 18, 23));
     spriteMap.setTextureRect(sf::IntRect(0, 0, 1408,928));
     sprite.setColor(sf::Color::Red);
     sprite2.setColor(sf::Color::Blue); 
     // Lo dispongo en el centro de la pantalla
-    sprite.setPosition(185,460);
-    sprite2.setPosition(155, 460);
+    sprite.setPosition(190,460);
+    sprite2.setPosition(160, 460);
     spriteMap.setPosition(0,0);
     window.clear(sf::Color::White);
     bool rebote1=false,rebote2=false,relen1=false,relen2=false,golpeado1=false,golpeado2=false;
@@ -148,7 +143,7 @@ int main()
     musica0.play();
     musica0.setLoop(true);
     //Bucle del juego
-        
+    
     while (window.isOpen())
     {
         if(reinicio)
@@ -156,9 +151,16 @@ int main()
             
             control1 = 0;
             control2 = 0;
-            
-            sprite.setPosition(185,460);
-            sprite2.setPosition(155, 460);
+            pI1.setPosition(190,460);
+            pD1.setPosition(190,460);
+            pU1.setPosition(160,460);
+            pW1.setPosition(160,460);
+            pI1.setRotation(0);
+            pW1.setRotation(0);
+            pU1.setRotation(0);
+            pD1.setRotation(0);
+            sprite.setPosition(190,460);
+            sprite2.setPosition(160, 460);
             sprite.setRotation(0);
             sprite2.setRotation(0);
             acel = 0;
@@ -323,7 +325,7 @@ int main()
                         break;
                         //controles ia o player 2
                         case sf::Keyboard::D:
-                            if(estado == 7)
+                            if(estado == 7 && ia == false)
                             {
                                 ri2 = true;
                             }
@@ -331,7 +333,7 @@ int main()
                         break;
 
                         case sf::Keyboard::A:
-                            if(estado == 7)
+                            if(estado == 7 && ia == false)
                             {
                                 le2 = true;
                             }
@@ -339,14 +341,14 @@ int main()
                         break;                        
                         
                         case sf::Keyboard::W:
-                            if(estado == 7)
+                            if(estado == 7 && ia == false)
                             {
                                 up2 = true;
                             }
                         break;
                         
                         case sf::Keyboard::S:
-                            if(estado == 7)
+                            if(estado == 7 && ia == false)
                             {
                                 down2 = true;
                             }
@@ -372,7 +374,7 @@ int main()
                             }
                             else
                             {
-                                std::cout << "fpsview Activo" << std::endl;
+                                //std::cout << "fpsview Activo" << std::endl;
                                 fpsview = true;
                             }
                             break;
@@ -402,9 +404,17 @@ int main()
         }
         
         if(ri)
-            sprite.setRotation(sprite.getRotation()+5);   
+        {
+            sprite.setRotation(sprite.getRotation()+5);
+            pD1.setRotation(pD1.getRotation()+5);
+            pI1.setRotation(pD1.getRotation()+5);
+        }
         if(le)
+        {
             sprite.setRotation(sprite.getRotation()-5);
+            pD1.setRotation(pD1.getRotation()-5);
+            pI1.setRotation(pD1.getRotation()-5);
+        }
         if(relojAceleracion.getElapsedTime().asMilliseconds() > 200)
         {
             if(ri || le)//nos sirve para saber si esta derrapando
@@ -461,6 +471,8 @@ int main()
             float rad = PI/180*(sprite.getRotation()-90);
             jugador1.move(acel*cos(rad),acel*sin(rad));
             sprite.move(acel*cos(rad),acel*sin(rad));
+            pI1.move(acel*cos(rad),acel*sin(rad));
+            pD1.move(acel*cos(rad),acel*sin(rad));
         }
         else
         {
@@ -469,12 +481,22 @@ int main()
             sprite.move(-15*cos(rad),-15*sin(rad));
             rebote1 = false;
             acel = 0;
+            pI1.move(-15*cos(rad),-15*sin(rad));
+            pD1.move(-15*cos(rad),-15*sin(rad));
         }
         
         if(ri2)
-            sprite2.setRotation(sprite2.getRotation()+5);   
+        {
+            sprite2.setRotation(sprite2.getRotation()+5); 
+            pW1.setRotation(pW1.getRotation()+5);
+            pU1.setRotation(pU1.getRotation()+5);
+        }
         if(le2)
+        {
             sprite2.setRotation(sprite2.getRotation()-5);
+            pW1.setRotation(pW1.getRotation()-5);
+            pU1.setRotation(pU1.getRotation()-5);
+        }
         if(relojAceleracion2.getElapsedTime().asMilliseconds() > 200)
         {
             if(ri2 || le2)//nos sirve para saber si esta derrapando
@@ -536,6 +558,8 @@ int main()
             float rad = PI/180*(sprite2.getRotation()-90);
             jugador2.move(acel2*cos(rad),acel2*sin(rad));
             sprite2.move(acel2*cos(rad),acel2*sin(rad));
+            pW1.move(acel2*cos(rad),acel2*sin(rad));
+            pU1.move(acel2*cos(rad),acel2*sin(rad));                
         }
         else
         {
@@ -544,6 +568,8 @@ int main()
             sprite2.move(-15*cos(rad),-15*sin(rad));
             rebote2 = false;
             acel2 = 0;
+            pW1.move(-15*cos(rad),-15*sin(rad));
+            pU1.move(-15*cos(rad),-15*sin(rad));  
         }
         
         if(fpsview)
@@ -558,10 +584,52 @@ int main()
             //fin fps
         }
         
-        sf::Image coche = sprite.getTexture()->copyToImage();
-        sf::Image coche2 = sprite2.getTexture()->copyToImage();
         
-        //std::cout << "color " << maparuta.getPixel(sprite.getPosition().x,sprite.getPosition().y).toInteger() << std::endl;
+        if(sprite.getGlobalBounds().intersects(sprite2.getGlobalBounds()))
+        {
+            bool choqu = false;
+            if(pD1.getGlobalBounds().intersects(pW1.getGlobalBounds()))
+            {
+                //std::cout << "choque 1" << std::endl;
+                sprite.setPosition(sprite.getPosition().x-3,sprite.getPosition().y-3);
+                pD1.setPosition(pD1.getPosition().x-3,pD1.getPosition().y-3);
+                pI1.setPosition(pI1.getPosition().x-3,pI1.getPosition().y-3);
+                jugador1.setCenter(sprite.getPosition().x,sprite.getPosition().y);
+                sprite2.setPosition(sprite2.getPosition().x+2,sprite2.getPosition().y+2);
+                pW1.setPosition(pW1.getPosition().x+2,pW1.getPosition().y+2);
+                pU1.setPosition(pU1.getPosition().x+2,pU1.getPosition().y+2);
+                jugador2.setCenter(sprite2.getPosition().x,sprite2.getPosition().y);
+                choqu = true;
+            }
+            else if(pD1.getGlobalBounds().intersects(pU1.getGlobalBounds()))
+            {
+                sprite.setPosition(sprite.getPosition().x+3,sprite.getPosition().y+3);
+                pD1.setPosition(pD1.getPosition().x+3,pD1.getPosition().y+3);
+                pI1.setPosition(pI1.getPosition().x+3,pI1.getPosition().y+3);
+                jugador1.setCenter(sprite.getPosition().x,sprite.getPosition().y);
+                sprite2.setPosition(sprite2.getPosition().x-2,sprite2.getPosition().y-2);
+                pW1.setPosition(pW1.getPosition().x-2,pW1.getPosition().y-2);
+                pU1.setPosition(pU1.getPosition().x-2,pU1.getPosition().y-2);
+                jugador2.setCenter(sprite2.getPosition().x,sprite2.getPosition().y);
+                choqu = true;
+            }
+            else if(pI1.getGlobalBounds().intersects(pU1.getGlobalBounds()))
+            {
+                sprite.setPosition(sprite.getPosition().x+3,sprite.getPosition().y+3);
+                pD1.setPosition(pD1.getPosition().x+3,pD1.getPosition().y+3);
+                pI1.setPosition(pI1.getPosition().x+3,pI1.getPosition().y+3);
+                jugador1.setCenter(sprite.getPosition().x,sprite.getPosition().y);
+                sprite2.setPosition(sprite2.getPosition().x-2,sprite2.getPosition().y-2);
+                pW1.setPosition(pW1.getPosition().x-2,pW1.getPosition().y-2);
+                pU1.setPosition(pU1.getPosition().x-2,pU1.getPosition().y-2);
+                jugador2.setCenter(sprite2.getPosition().x,sprite2.getPosition().y-2);
+                choqu = true;
+            }
+            if(choqu)
+            {
+                choque0.play();
+            }
+        }
         if(sprite.getPosition().x >= 0 && sprite.getPosition().x <= 1408 && sprite.getPosition().y >= 0 && sprite.getPosition().y <= 945)
         {
             if(mapa.getPixel(sprite.getPosition().x,sprite.getPosition().y).toInteger() == 16711935)
@@ -671,44 +739,64 @@ int main()
             if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 4277272831)
             {
                 sprite2.setRotation(0);
+                pW1.setRotation(0);
+                pU1.setRotation(0);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 3051691519)
             {
                 sprite2.setRotation(40);
+                pW1.setRotation(40);
+                pU1.setRotation(40);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 3111802879)
             {
                 sprite2.setRotation(90);
+                pW1.setRotation(90);
+                pU1.setRotation(90);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 598822399)
             {
                 sprite2.setRotation(135);
+                pW1.setRotation(135);
+                pU1.setRotation(135);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 3534946559)
             {
                 sprite2.setRotation(180);
+                pW1.setRotation(180);
+                pU1.setRotation(180);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 4272867839)
             {
                 sprite2.setRotation(225);
+                pW1.setRotation(225);
+                pU1.setRotation(225);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 2281707263)
             {
                 sprite2.setRotation(270);
+                pW1.setRotation(270);
+                pU1.setRotation(270);
             }
             else if(maparuta.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 3284386815)
             {
                 sprite2.setRotation(315);
+                pW1.setRotation(315);
+                pU1.setRotation(315);
             }
             else if(mapa.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 4278254079)
             {
                 //corregir direccion a la derecha
                 sprite2.setRotation(sprite2.getRotation()+10);
+                pW1.setRotation(sprite2.getRotation()+10);
+                pU1.setRotation(sprite2.getRotation()+10);
             }
             else if(mapa.getPixel(sprite2.getPosition().x,sprite2.getPosition().y).toInteger() == 4278190335)
             {
                 //corregir direccion a la izquierda
                 sprite2.setRotation(sprite2.getRotation()-8);
+                pW1.setRotation(sprite2.getRotation()-8);
+                pU1.setRotation(sprite2.getRotation()-8);
                 
             }            
         }
@@ -732,14 +820,6 @@ int main()
             }
         }
 
-        
-        /*if(sprite.getGlobalBounds().intersects(sprite2.getGlobalBounds()))
-        {
-            std::cout << "colision coches "<< std::endl;
-            
-            if(HayColisiones(coche,coche2,1,1,1,1))
-                    std::cout << "colision coches 2"<< std::endl;
-        }*/
         //parte sonido
         if(acel > 0)
         {
